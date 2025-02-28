@@ -1,13 +1,10 @@
 package org.juan.model;
 
 public class UserRole {
+
     private int id;
     private String role;
 
-    public UserRole() {
-
-    }
-    
     public UserRole(int id, String role) {
         this.id = id;
         this.role = role;

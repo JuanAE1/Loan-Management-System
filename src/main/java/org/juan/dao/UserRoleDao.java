@@ -16,7 +16,8 @@ public class UserRoleDao {
         List<UserRole> roles = new ArrayList<>();
         String sql = "SELECT * FROM user_role";
 
-        try (Connection connection = ConnectionUtil.getConnection()){
+        Connection connection = ConnectionUtil.getConnection();
+        try {
             PreparedStatement stmt = connection.prepareStatement(sql);
             ResultSet rs = stmt.executeQuery();
 
