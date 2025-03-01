@@ -37,13 +37,17 @@ public class UserService {
         return true;
     }
 
-    public boolean loginUser(String email, String pass){
+    public User checkUserCredentials(String email, String pass){
         User user = userDao.getUserByEmail(email);
         //Check if user exists
         if ( user == null){
-            return false;
+            return null;
         }
         //check is password is correct
-        return BCrypt.checkpw(pass, user.getPassword());
+        if(BCrypt.checkpw(pass, user.getPassword())){
+            return user;
+        };
+        //return null if password is incorrect
+        return null;
     }
 }

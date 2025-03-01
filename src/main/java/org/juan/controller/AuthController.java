@@ -1,14 +1,16 @@
 package org.juan.controller;
 
 import io.javalin.http.Context;
+import jakarta.servlet.http.HttpSession;
 import org.juan.dto.UserDto;
+import org.juan.model.User;
 import org.juan.service.UserService;
 
-public class UserController {
+public class AuthController {
 
     private final UserService userService;
 
-    public UserController(UserService userService) {
+    public AuthController(UserService userService) {
         this.userService = userService;
     }
 
@@ -40,13 +42,31 @@ public class UserController {
             ctx.status(400).json("{\"error\": \"Missing email or password\" }");
         }
 
-        boolean success = userService.loginUser(req.getEmail(), req.getPassword());
-        if (success){
-            // Typically you might return a JWT or session token here
-            // For now we will pretend they are authenticated without cookies
+        User authUser = userService.checkUserCredentials(req.getEmail(), req.getPassword());
+        if (authUser != null){
+            // Session
+            HttpSession session = ctx.req().getSession(true);
+            session.setAttribute("user", authUser);
             ctx.status(200).json("{\"Message\": \"Login successful\"}");
         } else {
             ctx.status(401).json("{\"error\": \"Invalid credentials\"}");
         }
+    }
+
+    public void checkLogin(Context ctx){
+        HttpSession session = ctx.req().getSession(false);
+        if(session != null && session.getAttribute("user") != null){
+            ctx.status(200).json("{\"message\":\"You are logged in\"}");
+        } else {
+            ctx.status(401).json("{\"error\":\"Not logged in\"}");
+        }
+    }
+
+    public void logout (Context ctx){
+        HttpSession session = ctx.req().getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        ctx.status(200).json("{\"message\":\"Logged out\"}");
     }
 }
