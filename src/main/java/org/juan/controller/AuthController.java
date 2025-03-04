@@ -4,14 +4,14 @@ import io.javalin.http.Context;
 import jakarta.servlet.http.HttpSession;
 import org.juan.dto.UserDto;
 import org.juan.model.User;
-import org.juan.service.UserService;
+import org.juan.service.AuthService;
 
 public class AuthController {
 
-    private final UserService userService;
+    private final AuthService authService;
 
-    public AuthController(UserService userService) {
-        this.userService = userService;
+    public AuthController(AuthService authService) {
+        this.authService = authService;
     }
 
     public void register (Context ctx){
@@ -28,7 +28,7 @@ public class AuthController {
         }
 
         boolean success =
-                userService.createUser(req.getEmail(), req.getPassword(), req.getName(), req.getLastName(), req.getRoleId());
+                authService.createUser(req.getEmail(), req.getPassword(), req.getName(), req.getLastName(), req.getRoleId());
 
         if (success){
             ctx.status(201).json("{\"message\":\"User registered successfully\"}");
@@ -42,7 +42,7 @@ public class AuthController {
             ctx.status(400).json("{\"error\": \"Missing email or password\" }");
         }
 
-        User authUser = userService.checkUserCredentials(req.getEmail(), req.getPassword());
+        User authUser = authService.checkUserCredentials(req.getEmail(), req.getPassword());
         if (authUser != null){
             // Session
             HttpSession session = ctx.req().getSession(true);
@@ -52,21 +52,21 @@ public class AuthController {
             ctx.status(401).json("{\"error\": \"Invalid credentials\"}");
         }
     }
-
-    public void checkLogin(Context ctx){
-        HttpSession session = ctx.req().getSession(false);
-        if(session != null && session.getAttribute("user") != null){
-            ctx.status(200).json("{\"message\":\"You are logged in\"}");
-        } else {
-            ctx.status(401).json("{\"error\":\"Not logged in\"}");
-        }
-    }
-
     public void logout (Context ctx){
         HttpSession session = ctx.req().getSession(false);
         if (session != null) {
             session.invalidate();
         }
         ctx.status(200).json("{\"message\":\"Logged out\"}");
+    }
+    public static boolean checkSession(Context ctx){
+        HttpSession session = ctx.req().getSession(false);
+        if(session != null && session.getAttribute("user") != null){
+            ctx.status(200).json("{\"message\":\"You are logged in\"}");
+            return true;
+        } else {
+            ctx.status(401).json("{\"error\":\"Not logged in\"}");
+            return false;
+        }
     }
 }
