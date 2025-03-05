@@ -1,11 +1,31 @@
 package org.juan.dto;
 
 public class UserDto {
+    private Integer id;
     private String email;
-    private String password;
     private String name;
     private String lastName;
     private Integer roleId;
+
+    public UserDto() {
+
+    }
+
+    public UserDto(Integer id, String email, String name, String lastName, Integer roleId) {
+        this.id = id;
+        this.email = email;
+        this.name = name;
+        this.lastName = lastName;
+        this.roleId = roleId;
+    }
+
+    public Integer getId() {
+        return id;
+    }
+
+    public void setId(Integer id) {
+        this.id = id;
+    }
 
     public String getEmail() {
         return email;
@@ -13,14 +33,6 @@ public class UserDto {
 
     public void setEmail(String email) {
         this.email = email;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 
     public String getName() {
@@ -51,7 +63,6 @@ public class UserDto {
     public String toString() {
         return "UserDto{" +
                 "email='" + email + '\'' +
-                ", password='" + password + '\'' +
                 ", name='" + name + '\'' +
                 ", lastName='" + lastName + '\'' +
                 ", roleId=" + roleId +

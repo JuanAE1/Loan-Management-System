@@ -1,6 +1,7 @@
 package org.juan.service;
 
-import org.juan.dao.AuthDao;
+import org.juan.dao.UserDao;
+import org.juan.dto.AuthDto;
 import org.juan.model.User;
 import org.springframework.security.crypto.bcrypt.BCrypt;
 
@@ -8,9 +9,9 @@ import java.text.SimpleDateFormat;
 
 public class AuthService {
 
-    private final AuthDao userDao;
+    private final UserDao userDao;
 
-    public AuthService(AuthDao userDao) {
+    public AuthService(UserDao userDao) {
         this.userDao = userDao;
     }
 
@@ -37,17 +38,17 @@ public class AuthService {
         return true;
     }
 
-    public User checkUserCredentials(String email, String pass){
-        User user = userDao.getUserByEmail(email);
+    public Boolean checkUserCredentials(String email, String pass){
+        AuthDto credentials = userDao.getUserEmailAndPasswordByEmail(email);
         //Check if user exists
-        if ( user == null){
-            return null;
+        if ( credentials == null){
+            return false;
         }
         //check is password is correct
-        if(BCrypt.checkpw(pass, user.getPassword())){
-            return user;
+        if(BCrypt.checkpw(pass, credentials.getPassword())){
+            return true;
         };
         //return null if password is incorrect
-        return null;
+        return false;
     }
 }
