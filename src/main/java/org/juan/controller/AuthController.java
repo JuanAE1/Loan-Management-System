@@ -70,12 +70,34 @@ public class AuthController {
     }
     public static boolean checkSession(Context ctx){
         HttpSession session = ctx.req().getSession(false);
+        return session != null && session.getAttribute("user") != null;
+    }
+
+    public static Integer getLoggedUserId(Context ctx){
+        HttpSession session = ctx.req().getSession(false);
         if(session != null && session.getAttribute("user") != null){
-            ctx.status(200).json("{\"message\":\"You are logged in\"}");
-            return true;
+            UserDto loggedUser = (UserDto) session.getAttribute("user");
+            return loggedUser.getId();
         } else {
-            ctx.status(401).json("{\"error\":\"Not logged in\"}");
-            return false;
+            return null;
         }
+    }
+    public static Integer getLoggedUserRole(Context ctx){
+        HttpSession session = ctx.req().getSession(false);
+        if(session != null && session.getAttribute("user") != null){
+            UserDto loggedUser = (UserDto) session.getAttribute("user");
+            return loggedUser.getRoleId();
+        } else {
+            return null;
+        }
+    }
+
+    public static boolean userIdEqualsSessionId(Context ctx) {
+        Integer loggedUserId = AuthController.getLoggedUserId(ctx);
+        int requestedUserId = Integer.parseInt(ctx.pathParam("id"));
+        if (loggedUserId != null){
+            return loggedUserId.equals(requestedUserId);
+        }
+        return false;
     }
 }

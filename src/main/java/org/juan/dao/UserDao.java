@@ -6,6 +6,7 @@ import org.juan.model.User;
 import org.juan.util.ConnectionUtil;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class UserDao {
 
@@ -31,6 +32,28 @@ public class UserDao {
         }
     }
 
+    public ArrayList<UserDto> getAllUsers(){
+        ArrayList<UserDto> users = new ArrayList<>();
+        String sql = "SELECT id, email, name, last_name, role_id FROM user_account";
+        try {
+            PreparedStatement stmt = connection.prepareStatement(sql);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()){
+                 users.add(new UserDto(
+                         rs.getInt("id"),
+                         rs.getString("email"),
+                         rs.getString("name"),
+                         rs.getString("last_name"),
+                         rs.getInt("role_id")
+                 ));
+            }
+            return users;
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
     public UserDto getUserById(int id){
         String sql = "SELECT id, email, name, last_name, role_id FROM user_account WHERE id = ?";
         try {
@@ -51,6 +74,7 @@ public class UserDao {
         }
         return null;
     }
+
     public UserDto getUserByEmail(String email){
         String sql = "SELECT id, email, name, last_name, role_id FROM user_account WHERE email = ?";
         Connection conn = ConnectionUtil.getConnection();
@@ -83,7 +107,7 @@ public class UserDao {
             stmt.setInt(4, updatedUser.getRoleId());
             stmt.setTimestamp(5, now);
             stmt.setInt(6, id);
-            stmt.execute();
+            stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
             e.printStackTrace();
@@ -95,7 +119,7 @@ public class UserDao {
         try {
             PreparedStatement stmt = connection.prepareStatement(sql);
             stmt.setInt(1, id);
-            stmt.execute();
+            stmt.executeUpdate();
             return true;
         } catch (SQLException e) {
             e.printStackTrace();

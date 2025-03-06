@@ -5,12 +5,17 @@ import org.juan.dto.UserDto;
 
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 
 public class UserService {
     private final UserDao userDao;
 
     public UserService(UserDao userDao) {
         this.userDao = userDao;
+    }
+
+    public ArrayList<UserDto> getAllUsers(){
+        return userDao.getAllUsers();
     }
 
     public UserDto getUserById(int id){
