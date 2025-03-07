@@ -15,40 +15,44 @@ public class AuthService {
         this.userDao = userDao;
     }
 
-    public boolean createUser(String email, String pass, String name, String lastName, Integer roleId) {
+    public int createUser(User newUser) {
+        //Check if there's any missing fields
+        if(newUser.getEmail() == null || newUser.getPassword() == null ||
+                newUser.getName() == null || newUser.getLastName() == null){
+            return 400;
+        }
         //Check if user already exists
-        if (userDao.getUserByEmail(email) != null) {
-            return false;
+        if (userDao.getUserByEmail(newUser.getEmail()) != null) {
+            System.out.println("already exists");
+            return 409;
+        }
+        //If role is missing by default it's a regular user (roleId = 2)
+        if(newUser.getRoleId() == null){
+            newUser.setRoleId(2);
         }
         //encrypt password with Bcrypt
-        String hashPassword = BCrypt.hashpw(pass,BCrypt.gensalt());
+        String hashPassword = BCrypt.hashpw(newUser.getPassword(), BCrypt.gensalt());
+        newUser.setPassword(hashPassword);
         //timestamp YYYY-MM-DD HH:MI:SS
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
-        //creates the user object and sends it to the dao layer
-        User newUser = new User();
-        newUser.setEmail(email);
-        newUser.setPassword(hashPassword);
-        newUser.setName(name);
-        newUser.setLastName(lastName);
         newUser.setCreatedTime(timeStamp);
         newUser.setUpdatedTime(timeStamp);
-        newUser.setRoleId(roleId);
-
         userDao.createUser(newUser);
-        return true;
+        return 201;
     }
 
     public Boolean checkUserCredentials(String email, String pass){
-        AuthDto credentials = userDao.getUserEmailAndPasswordByEmail(email);
-        //Check if user exists
-        if ( credentials == null){
-            return false;
+        if(email != null && pass != null){
+            AuthDto credentials = userDao.getUserEmailAndPasswordByEmail(email);
+            //Check if user exists
+            if ( credentials == null){
+                return false;
+            }
+            //check is password is correct
+            return BCrypt.checkpw(pass, credentials.getPassword());
         }
-        //check is password is correct
-        if(BCrypt.checkpw(pass, credentials.getPassword())){
-            return true;
-        };
-        //return null if password is incorrect
+        //return false if any field is missing
         return false;
+
     }
 }

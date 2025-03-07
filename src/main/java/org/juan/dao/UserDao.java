@@ -28,7 +28,7 @@ public class UserDao {
             stmt.setInt(7, newUser.getRoleId());
             stmt.executeUpdate();
         } catch (SQLException e){
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
     }
 
@@ -92,7 +92,7 @@ public class UserDao {
                 );
             }
         } catch (SQLException e){
-            e.printStackTrace();
+            System.out.println(e.getMessage());
         }
         return null;
     }

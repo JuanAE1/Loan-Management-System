@@ -27,9 +27,21 @@ public class UserService {
     }
 
     public boolean updateUser(UserDto updatedUser, int id){
-        //timestamp YYYY-MM-DD HH:MI:SS
-        String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
-        return userDao.updateUser(updatedUser, id, Timestamp.valueOf(timeStamp));
+        //check for no missing fields
+        if(updatedUser.getEmail() == null || updatedUser.getName() == null ||
+                updatedUser.getLastName() == null || updatedUser.getRoleId() == null){
+            return false;
+        } else {
+            UserDto user = getUserById(id);
+            //check that user exists in the db
+            if (user != null){
+                //timestamp YYYY-MM-DD HH:MI:SS
+                String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new java.util.Date());
+                return userDao.updateUser(updatedUser, id, Timestamp.valueOf(timeStamp));
+            } else {
+                return false;
+            }
+        }
     }
 
     public boolean deleteUser(int id){

@@ -16,6 +16,7 @@ public class UserController {
 
     public void getAllUsers(Context ctx){
         Integer userRoleId = AuthController.getLoggedUserRole(ctx);
+        //check if user is manager
         if (userRoleId != null && userRoleId == 1){
             ArrayList<UserDto> users = userService.getAllUsers();
             if (users != null){
@@ -48,23 +49,11 @@ public class UserController {
         if (AuthController.userIdEqualsSessionId(ctx)){
             int id = Integer.parseInt(ctx.pathParam("id"));
             UserDto updatedUser = ctx.bodyAsClass(UserDto.class);
-            //check for no missing fields
-            if(updatedUser.getEmail() == null || updatedUser.getName() == null ||
-                    updatedUser.getLastName() == null || updatedUser.getRoleId() == null){
-                ctx.status(400).json("{\"error\":\"Missing field\"}");
+            boolean success = userService.updateUser(updatedUser, id);
+            if (success){
+                ctx.status(200).json("{\"message\":\"User updated successfully\"}");
             } else {
-                UserDto user = userService.getUserById(id);
-                //check that user exists in the db
-                if (user != null){
-                    boolean success = userService.updateUser(updatedUser, id);
-                    if (success){
-                        ctx.status(200).json("{\"message\":\"User updated successfully\"}");
-                    } else {
-                        ctx.status(500).json("{\"error\":\"something went wrong with the database\"}");
-                    }
-                } else {
-                    ctx.status(404).json("{\"error\":\"User not found\"}");
-                }
+                ctx.status(400).json("{\"error\":\"Missing fields or user doesn't exists\"}");
             }
         } else {
             ctx.status(403).json("{\"error\":\"You can't update other users info\"}");

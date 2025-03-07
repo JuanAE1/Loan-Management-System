@@ -47,7 +47,7 @@ public class Main {
         app.delete("users/{id}", userController::deleteUser);
 
         //Loan endpoints
-        app.get("users/{id}/loans", loanController::getMyLoans);
+        app.get("user/my-loans", loanController::getMyLoans);
         app.post("loans", loanController::createLoan);
         app.get("loans", loanController::getAllLoans);
         app.get("loans/{id}", loanController::getLoanById);

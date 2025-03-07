@@ -1,0 +1,57 @@
+create table user_role (
+	id serial primary key,
+	role text not null unique
+);
+
+create table status (
+	id serial primary key,
+	status text not null unique
+); 
+
+CREATE TABLE loan_type (
+	id SERIAL PRIMARY KEY,
+	type TEXT NOT NULL UNIQUE
+);
+
+CREATE TABLE user_account (
+	id serial primary key,
+	email text not null unique,
+	hash_pass text not null,
+	name text not null,
+	last_name text not null,
+	created_time timestamp not null,
+	updated_time timestamp not null,
+	role_id integer,
+	foreign key (role_id) references user_role (id)
+);
+
+create table loan (
+	id serial primary key,
+	amount decimal not null,
+	term integer not null,
+	created_time timestamp not null,
+	updated_time timestamp not null,
+	type_id integer,
+	status_id integer,
+	user_id integer,
+	foreign key (type_id) references loan_type (id),
+	foreign key (status_id) references status (id),
+	foreign key (user_id) references user_account (id) ON DELETE CASCADE
+);
+
+/*Queries to fill the catalogs loan_type, user_role and status*/
+INSERT INTO user_role ("role" ) VALUES ('Manager');
+INSERT INTO user_role ("role" ) VALUES ('Regular');
+
+INSERT INTO loan_type ("type") VALUES ('Mortgage');
+INSERT INTO loan_type ("type") VALUES ('Auto');
+INSERT INTO loan_type ("type") VALUES ('Personal');
+INSERT INTO loan_type ("type") VALUES ('Student');
+INSERT INTO loan_type ("type") VALUES ('Medical');
+INSERT INTO loan_type ("type") VALUES ('Home Equity');
+
+INSERT INTO status ("status") VALUES ('Pending');
+INSERT INTO status ("status") VALUES ('Approved');
+INSERT INTO status ("status") VALUES ('Rejected');
+
+

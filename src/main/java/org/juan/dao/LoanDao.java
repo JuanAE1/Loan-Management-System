@@ -133,17 +133,15 @@ public class LoanDao {
             return false;
         }
     }
-    public boolean approveLoan(int loanId){
+    public void approveLoan(int loanId){
         String sql = "UPDATE loan SET status_id = ? WHERE id = ?;";
         try {
             PreparedStatement stmt = connection.prepareStatement(sql);
-            stmt.setInt(1, 3); // the status id of "approve" is 3
+            stmt.setInt(1, 2); // the status id of "approve" is 2
             stmt.setInt(2, loanId);
             stmt.executeUpdate();
-            return true;
         } catch (SQLException e) {
             System.out.println(e.getMessage());
-            return false;
         }
     }
 
@@ -151,7 +149,7 @@ public class LoanDao {
         String sql = "UPDATE loan SET status_id = ? WHERE id = ?;";
         try {
             PreparedStatement stmt = connection.prepareStatement(sql);
-            stmt.setInt(1, 4); // the status id of "reject" is 4
+            stmt.setInt(1, 3); // the status id of "reject" is 3
             stmt.setInt(2, loanId);
             stmt.executeUpdate();
             return true;

@@ -20,32 +20,22 @@ public class AuthController {
 
     public void register (Context ctx){
         User req = ctx.bodyAsClass(User.class);
-        //Check if there's any missing fields
-        if(req.getEmail() == null || req.getPassword() == null ||
-                req.getName() == null || req.getLastName() == null){
-            ctx.status(400).json("{\"error\":\"Missing a field\"}");
-            return;
-        }
-        //If role is missing by default it's a regular user (roleId = 2)
-        if(req.getRoleId() == null){
-            req.setRoleId(2);
-        }
-
-        boolean success =
-                authService.createUser(req.getEmail(), req.getPassword(), req.getName(), req.getLastName(), req.getRoleId());
-
-        if (success){
-            ctx.status(201).json("{\"message\":\"User registered successfully\"}");
-        } else {
-            ctx.status(409).json("{\"error\":\"An account with this email already exists\"}");
+        int status = authService.createUser(req);
+        switch (status){
+            case 201:
+                ctx.status(201).json("{\"message\":\"User registered successfully\"}");
+                break;
+            case 400:
+                ctx.status(409).json("{\"error\":\"Some fields are missing\"}");
+                break;
+            case 409:
+                ctx.status(409).json("{\"error\":\"An account with this email already exists\"}");
+                break;
         }
     }
+
     public void login (Context ctx){
         AuthDto req = ctx.bodyAsClass(AuthDto.class);
-        if(req.getEmail() == null || req.getPassword() == null){
-            ctx.status(400).json("{\"error\": \"Missing email or password\" }");
-        }
-
         boolean validCredentials = authService.checkUserCredentials(req.getEmail(), req.getPassword());
         if (validCredentials){
             //get user
